@@ -1,3 +1,5 @@
+import uuid from 'uuid';
+
 import {
   GraphQLObjectType,
   GraphQLSchema,
@@ -10,7 +12,7 @@ import {
   GraphQLLimitedString
 } from 'graphql-custom-types';
 
-import { getPosts, getAuthor, getAuthors, getComments, createPost } from './dynamo';
+import { getPosts, getAuthor, getAuthors, getComments, createPost, createComment } from './dynamo';
 
 const Author = new GraphQLObjectType({
   name: "Author",
@@ -52,7 +54,7 @@ const Post = new GraphQLObjectType({
     comments: {
       type: new GraphQLList(Comment),
       resolve: function(post) {
-        return getComments();
+        return getComments(post.id);
       }
     }
   })
@@ -92,11 +94,30 @@ const Query = new GraphQLObjectType({
 const Mutuation = new GraphQLObjectType({
   name: 'BlogMutations',
   fields: {
+    createComment: {
+      type: Comment,
+      description: "Create blog comment",
+      args: {
+        id: {
+          type: GraphQLString,
+          defaultValue: uuid.v4()
+        },
+        postId: {type: new GraphQLNonNull(GraphQLString)},
+        content: {type: new GraphQLNonNull(GraphQLString)},
+        author: {type: new GraphQLNonNull(GraphQLString), description: "Id of the author"}
+      },
+      resolve: function(source, args) {
+        return createComment(args);
+      }
+    },
     createPost: {
       type: Post,
       description: "Create blog post",
       args: {
-        id: {type: new GraphQLNonNull(GraphQLString)},
+        id: {
+          type: GraphQLString,
+          defaultValue: uuid.v4()
+        },
         title: {type: new GraphQLLimitedString(10, 30)},
         bodyContent: {type: new GraphQLNonNull(GraphQLString)},
         author: {type: new GraphQLNonNull(GraphQLString), description: "Id of the author"}

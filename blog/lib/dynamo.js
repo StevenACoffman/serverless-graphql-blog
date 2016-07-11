@@ -26,6 +26,31 @@ export function createPost(post) {
   });
 }
 
+export function createComment(comment) {
+  return new Promise(function(resolve, reject) {
+    var params = {
+      TableName: commentsTable,
+      Item: comment
+    };
+
+    docClient.get({
+      TableName: postsTable,
+      Key: {
+        id: comment.postId
+      },
+      AttributesToGet: [ "id" ]
+    }, function(err, data) {
+      if (err) return reject(err);
+      if(!data.Item) return reject(new Error(`Post with id: ${comment.postId} does not exist`));
+
+      docClient.put(params, function(err, data) {
+        if (err) return reject(err);
+        return resolve(comment);
+      });
+    })
+  });
+}
+
 export function getPosts() {
   return new Promise(function(resolve, reject) {
     var params = {
@@ -85,15 +110,14 @@ export function getAuthors() {
   });
 }
 
-export function getComments() {
+export function getComments(postId) {
   return new Promise(function(resolve, reject) {
     var params = {
       TableName: commentsTable,
-      AttributesToGet: [
-        'id',
-        'content',
-        'author'
-      ]
+      FilterExpression : 'postId = :postId',
+      ExpressionAttributeValues : {
+        ':postId' : postId
+      }
     };
 
     docClient.scan(params, function(err, data) {
