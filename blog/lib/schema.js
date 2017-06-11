@@ -89,7 +89,7 @@ const Query = new GraphQLObjectType({
   })
 });
 
-const Mutuation = new GraphQLObjectType({
+const Mutation = new GraphQLObjectType({
   name: 'BlogMutations',
   fields: {
     createPost: {
@@ -110,7 +110,7 @@ const Mutuation = new GraphQLObjectType({
 
 const Schema = new GraphQLSchema({
   query: Query,
-  mutation: Mutuation
+  mutation: Mutation
 });
 
 export default Schema;
