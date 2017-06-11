@@ -85,7 +85,7 @@ const Query = new GraphQLObjectType({
         id: {type: new GraphQLNonNull(GraphQLString)}
       },
       resolve: function(source, {id}) {
-        return getAuthor(author);
+        return getAuthor(id);
       }
     }
   })
