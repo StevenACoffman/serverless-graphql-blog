@@ -5,7 +5,7 @@ export function runGraphQL(event, cb) {
 
   let query = event.query;
 
-  // patch to allow queries from GraphiQL
+  // patch to allow queries from GraphQL
   // like the initial introspectionQuery
   if (event.query && event.query.hasOwnProperty('query')) {
     query = event.query.query.replace("\n", ' ', "g");
